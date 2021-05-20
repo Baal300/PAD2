@@ -35,6 +35,11 @@ int MediaFile::releaseDate() const
     return m_releaseDate;
 }
 
+MediaFile::MediaFile()
+{
+
+}
+
 MediaFile::MediaFile(const string title, const int length, const string genre) : m_title{title}, m_length{length}, m_genre{genre}
 {
 
@@ -51,6 +56,7 @@ MediaFile::MediaFile(const string title, const int length, const string genre, c
 void MediaFile::printInformation() const
 {
     cout << "---------------------------------------\n"
+         << "*Media File*\n"
          << "Title: " << m_title << '\n'
          << "Length: " << m_length << " minutes\n"
          << "Genre: " << m_genre << '\n';

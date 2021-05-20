@@ -15,35 +15,36 @@ void Movie::setReleaseDate(const int &releaseDate)
 
 void Movie::play() const
 {
-    cout << "The Movie " << m_title << " is playing right now.\n";
+    cout << "The Movie " << title() << " is playing right now.\n";
 }
 
 void Movie::compareOlder(const Movie &movie)
 {
     if (m_releaseDate > movie.releaseDate())
     {
-        cout << movie.title() << " is older than " << m_title << '\n';
+        cout << movie.title() << " is older than " << title() << '\n';
     }
     else
     {
-        cout << m_title << " is older than " << movie.title() << '\n';
+        cout << title() << " is older than " << movie.title() << '\n';
     }
 }
 
 void Movie::printInformation() const
 {
     cout << "---------------------------------------\n"
-         << "Title: " << m_title << '\n'
-         << "Length: " << m_length << " minutes\n"
-         << "Genre: " << m_genre << '\n'
+         << "*Movie*\n"
+         << "Title: " << title() << '\n'
+         << "Length: " << length() << " minutes\n"
+         << "Genre: " << genre() << '\n'
          << "Release year: " << m_releaseDate << '\n';
 
-    if(m_ratings.size() >= 1)
+    if(ratings().size() >= 1)
     {
-        cout << "Average rating: " << m_averageRating << '\n'
+        cout << "Average rating: " << averageRating() << '\n'
              << "List of ratings: " << '\n';
 
-        for (int rating : m_ratings)
+        for (int rating : ratings())
         {
             cout << rating << "\n";
         }
@@ -55,6 +56,16 @@ void Movie::printInformation() const
         cout << "No ratings available for this title\n"
              << "---------------------------------------\n";
     }
+}
+
+string Movie::type() const
+{
+    return m_type;
+}
+
+Movie::Movie()
+{
+
 }
 
 Movie::Movie(const string title, const int length, const string genre) : MediaFile(title, length, genre)

@@ -1,5 +1,6 @@
 #include "database.h"
 #include "movie.h"
+#include "series.h"
 #include <iostream>
 #include <algorithm>
 #include <fstream>
@@ -67,7 +68,7 @@ void Database::menu()
             playAll();
             break;
         case 2:
-            play();
+            play();             //Has to recognize which type of Media File we want to play
             break;
         case 3:
             addRating();
@@ -97,6 +98,9 @@ void Database::menu()
 void Database::compareOlderMovies(const int pos1, const int pos2)
 {
     //Need a way to call compareOlder from Movie class with a MediaFile object
+    Movie* a = static_cast<Movie*>(m_videos[pos1-1]);
+    Movie* b = static_cast<Movie*>(m_videos[pos2-1]);
+    a->compareOlder(*b);
 }
 
 Database::Database()
@@ -111,7 +115,15 @@ void Database::printList()
     for (int i{0}; i < m_videos.size(); i++)
     {
         cout << "\n<<" << i+1 << ">>\n";
-        m_videos[i]->printInformation();                    //WIP: If the MediaFile is a Movie call printInformation of Movie
+        Movie* a = static_cast<Movie*>(m_videos[i]);
+
+        //Identify as Movie if MediaFile has release date //Doesn't work WIP
+        if(a->releaseDate() != 0)
+        {
+            a->printInformation();
+        } else {
+        m_videos[i]->printInformation();
+        }
     }
 }
 
@@ -124,7 +136,7 @@ void Database::addVideo(const MediaFile &video)
 void Database::remove(int pos)
 {
     delete m_videos[pos];   //Free the dynamically located memory
-    m_videos.erase(m_videos.begin()+pos);
+    m_videos.erase(m_videos.begin()+pos);   //Removes the pointer
 
 }
 
@@ -156,7 +168,7 @@ void Database::play()
     {
         try
         {
-            cout << "Please enter the position of the movie you want to play: ";
+            cout << "Please enter the position of the media file you want to play: ";
             cin >> pos;
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //In case we have extraneous inputs
 
@@ -181,12 +193,28 @@ void Database::play()
         break;
     }while(true);
 
+    //Another play method will be called depending on type of Media File
+    Movie* m = static_cast<Movie*>(m_videos[pos-1]);
+    Series* s = static_cast<Series*>(m_videos[pos-1]);
+
+    /*
+    if(m->type() == "Movie"){
+        m->play();
+        return;
+    }
+    else if(s->type() == "Series"){
+        s->play();
+        return;
+    }
+    */
+
     play(pos);
 }
 
 void Database::play(const int pos)
 {
     missingFile();
+    //Has to recognize which type of mediafile we want to play
     m_videos[pos-1]->play(); //Position 1 = index 0 in the vector
     m_totalPlaybackTime += m_videos[pos-1]->length();
     m_averagePlaybackTime = static_cast<double>(m_totalPlaybackTime) / m_videos.size();
@@ -284,7 +312,7 @@ void Database::init()
         int inputLength{-1};
         vector<int> inputRatings;
         string inputGenre;
-        int inputReleaseDate;
+        int inputReleaseDate{0};
 
         string line;
 
@@ -311,7 +339,7 @@ void Database::init()
         //Read file as words
         while (source >> word)
         {
-            if(word != "Bewertungen:" && word != "Genre:" && word != "Erscheinungsdatum:")
+            if( (word != "Bewertungen:") && (word != "Genre:") && (word != "Erscheinungsdatum:") && (word!= "*****"))
             {
                 inputRatings.push_back(stoi(word));     //Ratings are stored in a vector
             }
@@ -321,18 +349,25 @@ void Database::init()
                 source >> word;
                 inputGenre = word;
             }
-
+            //Check for release date
             if(word == "Erscheinungsdatum:")
             {
                 source >> word;
                 inputReleaseDate = stoi(word);
+                break;
+            } else if (word == "*****") {
                 break;
             }
         }
 
         //Create a Movie object to include in database
         Movie inputMovie(inputTitle, inputLength, inputGenre, inputRatings);
+
+        //Only if there is a release date for the entry
+        if(inputReleaseDate != 0)
+        {
         inputMovie.setReleaseDate(inputReleaseDate);
+        }
 
         //Adds movie to database
         Database::addVideo(inputMovie);

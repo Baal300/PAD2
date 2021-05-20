@@ -16,14 +16,17 @@ private:
     int m_numberOfEpisodes;
     int m_currentEpisode;
     vector <MediaFile> series; //Vector contains series with its episodes
+    string m_type{"Series"}; //Could use enum for m_type
 public:
     Series(const string title, const int length, const string genre);
-    void play();
+    virtual void play();
     void play(int episode);
     int numberOfEpisodes() const;
     void setNumberOfEpisodes(int numberOfEpisodes);
     int currentEpisode() const;
     void setCurrentEpisode(int currentEpisode);
+    virtual void printInformation() const;
+    string type() const;
 };
 
 #endif // SERIES_H
